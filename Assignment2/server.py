@@ -88,6 +88,14 @@ def handle_client(client_socket, clients, client_username, group_socketList, use
                         group_members = message.split(" ")[3:]
                         group_members = " ".join(group_members)
                         group_members = group_members.split(", ")
+
+                        # Validate all group members are present
+                        missing_members = [member for member in group_members if member not in client_username.values()]
+                        if missing_members:
+                            missing_names = ", ".join(missing_members)
+                            client_socket.sendall(f"Cannot create group: {missing_names} not found.".encode('utf-8'))
+                            continue
+
                         group_members_sockets = [key for key, value in client_username.items() if value in group_members]
                         
                         # To ensure the creator is in the group too
@@ -105,6 +113,15 @@ def handle_client(client_socket, clients, client_username, group_socketList, use
                         # To send success message to all members of a group
                         for client in group_socketList[group_name]:
                             client.sendall(f"[You are enrolled in the {group_name} group]".encode('utf-8'))
+
+
+
+
+
+
+
+
+
 
                     elif second_command == "send":
                         if username not in username_groupName:
