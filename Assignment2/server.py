@@ -67,7 +67,6 @@ def handle_client(client_socket, clients, client_username, group_socketList, use
                 # 1st Command - QUIT
                 if command == "quit":
                     print(f"User {username} exited")
-
                     # Inform other clients that this client has quit
                     for client in clients:
                         if client != client_socket:
@@ -138,41 +137,66 @@ def handle_client(client_socket, clients, client_username, group_socketList, use
                                 if member_socket != client_socket:  # Don't echo to sender
                                     member_socket.sendall(f"[{group_name}]: {username} says: {group_message}".encode('utf-8'))
 
-
-
-
-
-
-
+                    # 4.3 - DELETE GROUP
                     elif second_command == "delete":
                         if username not in username_groupName:
                             client_socket.sendall(f"[You are not enrolled in any groups!]".encode('utf-8'))
                         else:
-                            group_name = message.split(" ")[3]
+                            # Attempt to parse the group name from the command
+                            try:
+                                group_name = message.split(" ",3)[3]
+                            except IndexError:
+                                client_socket.sendall("[Error: No group name specified.].".encode('utf-8'))
+                                continue
+
                             if group_name not in group_socketList.keys():
                                 client_socket.sendall(f"[The group {group_name} does not exist!]".encode('utf-8'))
                             else:
+                                # Notify all members about the group deletion
                                 group_members_sockets = group_socketList[group_name]
                                 for client in group_members_sockets:
                                     client.sendall(f"[The group {group_name} has been deleted!]".encode('utf-8'))
 
+                                # Remove all members from the group and delete the group
                                 group_members = [client_username[key] for key in group_members_sockets]
                                 for member in group_members:
                                     del username_groupName[member]
                                 
                                 del group_members_sockets[group_name]
 
-
+                    # 4.4 - LEAVE GROUP
                     elif second_command == "leave":
+                        #user is not part of this group
                         if username not in username_groupName:
-                            client_socket.sendall(f"[]".encode('utf-8'))
+                            client_socket.sendall("[Error: You are not a member of this group.]".encode('utf-8'))
                         else:
-                            group_name = message.split(" ")[3]
-                            if group_name == username_groupName[username]:
+                            # Attempt to parse the group name from the command
+                            try:
+                                group_name = message.split(" ")[3]
+                            except IndexError:
+                                client_socket.sendall("[Error: No group name specified.].".encode('utf-8'))
+                                continue
+
+                            if group_name not in group_socketList:
+                                client_socket.sendall(f"[Error: The group '{group_name}' does not exist!].".encode('utf-8'))
+                            elif group_name != username_groupName.get(username, ''):
+                                client_socket.sendall(f"[Error: You are not a member of '{group_name}'.].".encode('utf-8'))
+                            else:
+                                # Notify the group about the member leaving
+                                for member_socket in group_socketList[group_name]:
+                                    if member_socket != client_socket:  # Don't echo to the sender
+                                        member_socket.sendall(f"[{username} has left the group '{group_name}']. ".encode('utf-8'))
+
+                                # Notify the leaving client
                                 client_socket.sendall(f"[You have successfully left the group {group_name}]".encode('utf-8'))
+                                
+                                # Remove the user from the group and update mappings
+                                group_socketList[group_name].remove(client_socket)
                                 del username_groupName[username]
 
-                                group_members_sockets[group_name].remove(client_socket)
+                                # If the group becomes empty, delete it (OPTIONAL)
+                                #if not group_socketList[group_name]:
+                                    #del group_socketList[group_name]
 
                     else:
                         client_socket.sendall(f"Invalid command!".encode('utf-8'))
