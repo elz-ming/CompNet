@@ -3,8 +3,6 @@ import threading
 import time
 import sys
 
-new_function = "hucnuwebfunfvsiucseni"
-
 shutdown_event = threading.Event()
 
 # Function to receive messages from server
@@ -13,6 +11,7 @@ def receive_messages(client_socket, username):
         try:
             # Receive message from server
             message = client_socket.recv(1024).decode('utf-8')
+            #print(f"DEBUG: Received message: {message}")  # Debug print
             if not message:
                 print("\nServer has disconnected.")
                 shutdown_event.set()
