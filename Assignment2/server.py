@@ -114,26 +114,35 @@ def handle_client(client_socket, clients, client_username, group_socketList, use
                         for client in group_socketList[group_name]:
                             client.sendall(f"[You are enrolled in the {group_name} group]".encode('utf-8'))
 
-
-
-
-
-
-
-
-
-
+                    # 4.2 - GROUP SEND
                     elif second_command == "send":
+                        group_name, *group_message = message.split(" ")[2:]
+                        group_message = " ".join(group_message)
+
+                        try:
+                            group_name, group_message = message.split(" ", 2)[2].split(" ", 1)
+                        except ValueError:
+                            # This means either the group name or the message (or both) were not provided
+                            client_socket.sendall("[Error: Usage @group send [group_name] [message]].".encode('utf-8'))
+                            continue  # Skip further processing and wait for the next message
+
                         if username not in username_groupName:
                             client_socket.sendall(f"[You are not enrolled in any groups!]".encode('utf-8'))
+                        elif group_name not in group_socketList:
+                            client_socket.sendall(f"[Error: Group '{group_name}' does not exist.]".encode('utf-8'))
+                        elif not group_message.strip():
+                            # This checks for truly empty messages or messages that are just whitespace
+                            client_socket.sendall("[Error: Cannot send an empty message.]".encode('utf-8'))
                         else:
-                            message = message.split(" ")[3:]
-                            message = " ".join(message)
+                            for member_socket in group_socketList[group_name]:
+                                if member_socket != client_socket:  # Don't echo to sender
+                                    member_socket.sendall(f"[{group_name}]: {username} says: {group_message}".encode('utf-8'))
 
-                            group_name = username_groupName[username]
-                            for client in group_socketList[group_name]:
-                                if client != client_socket:
-                                    client.sendall(f"[{group_name}:] {message}".encode('utf-8'))
+
+
+
+
+
 
                     elif second_command == "delete":
                         if username not in username_groupName:
