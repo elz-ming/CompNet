@@ -3,6 +3,8 @@ import threading
 import time
 import sys
 
+new_function = "hucnuwebfunfvsiucseni"
+
 shutdown_event = threading.Event()
 
 # Function to receive messages from server
