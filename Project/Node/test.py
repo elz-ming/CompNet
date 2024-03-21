@@ -1,6 +1,3 @@
-
-
-
 # Test_1 - Creation of a block
 from block import Block
 import time
