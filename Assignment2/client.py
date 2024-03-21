@@ -9,9 +9,9 @@ shutdown_event = threading.Event()
 def receive_messages(client_socket, username):
     while not shutdown_event.is_set():
         try:
-            # Receive message from server
+            # ===== Receive message from server ============================================================
             message = client_socket.recv(1024).decode('utf-8')
-            #print(f"DEBUG: Received message: {message}")  # Debug print
+            
             if not message:
                 print("\nServer has disconnected.")
                 shutdown_event.set()
@@ -27,7 +27,7 @@ def receive_messages(client_socket, username):
             print(f"Error: {e}")
             shutdown_event.set()
             break
-
+    
 # Main function
 def main():
     # Client configuration
@@ -58,21 +58,21 @@ def main():
     receive_thread = threading.Thread(target=receive_messages, args=(client_socket, username))
     receive_thread.start()
 
-
-    time.sleep(1)
-    # Send messages to server
-    try:
-        while not shutdown_event.is_set():
+    while not shutdown_event.is_set():
+        try:
+            # ===== Prepare message to send ============================================================
             message = input()
             if message == '':
                 message = ' '
                 client_socket.sendall(message.encode('utf-8'))
-            elif message == "@quit":
-                shutdown_event.set()
             else:
                 client_socket.sendall(message.encode('utf-8'))
-    except KeyboardInterrupt:
-        shutdown_event.set()
+
+        except Exception as e:
+            print(f"Error: {e}")
+            shutdown_event.set()
+            break
+
 
     # Wait for the receiving thread to finish
     receive_thread.join()
