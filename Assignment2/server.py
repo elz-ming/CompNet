@@ -61,8 +61,13 @@ def handle_client(client_socket, clients, client_username, group_socketList, use
             
             # If client is sending a command
             if message[0] == "@":
-                command, *rest = message[1:].split(maxsplit=1)  # Extract command and the rest of the message
-                user_message = " ".join(rest) if rest else ""  # Join the rest back if it exists, otherwise empty string
+                #command, *rest = message[1:].split(maxsplit=1)  # Extract command and the rest of the message
+                #user_message = " ".join(rest) if rest else ""  # Join the rest back if it exists, otherwise empty string
+
+                message = message[1:]
+                parts = message.split(" ", 1) # Split message into command and the rest
+                command = parts[0]
+                user_message = parts[1] if len(parts) > 1 else ""  # Check if there is a message
 
                 # 1st Command - QUIT
                 if command == "quit":
@@ -205,12 +210,13 @@ def handle_client(client_socket, clients, client_username, group_socketList, use
                 elif command in client_username.values():
                     # Check if the target username exists among connected clients
                     target_sockets = [key for key, value in client_username.items() if value == command] 
-                        # If there's a message provided and the username exists
+                    
+                    # If there's a message provided and the username exists
                     if target_sockets: #check if user exists
                         target_socket = target_sockets[0]
                         if user_message:  # check if there is a message provided
                             target_socket.sendall(f"[{username}:] {user_message}".encode('utf-8'))
-                        else: # User not found
+                        else: # no message provided
                             print(f"Sending error message1 to {username}")
                             client_socket.sendall(f"[No message provided.]".encode('utf-8')) #this works
                 else: #user not found
