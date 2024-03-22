@@ -143,7 +143,7 @@ def handle_client(client_socket, clients, client_username, group_socketList, use
 
                         # To send success message to all members of a group
                         for client in group_socketList[group_name]:
-                            client.sendall(f"[You are enrolled in the {group_name} group]".encode('utf-8'))
+                            client.sendall(f"[You are enrolled in the '{group_name}' group]".encode('utf-8'))
 
                     # 4.2 - GROUP SEND
                     elif second_command == "send":
@@ -167,7 +167,7 @@ def handle_client(client_socket, clients, client_username, group_socketList, use
                         else:
                             for member_socket in group_socketList[group_name]:
                                 if member_socket != client_socket:  # Don't echo to sender
-                                    member_socket.sendall(f"[{group_name}-{username}: ]{group_message}".encode('utf-8'))
+                                    member_socket.sendall(f"[{group_name}-{username}:]{group_message}".encode('utf-8'))
 
                     # 4.3 - DELETE GROUP
                     elif second_command == "delete":
@@ -181,12 +181,12 @@ def handle_client(client_socket, clients, client_username, group_socketList, use
                         group_name = group_command_rest.strip()
 
                         if group_name not in group_socketList or username not in username_groupName or username_groupName[username] != group_name:
-                            client_socket.sendall(f"[The group {group_name} does not exist!]".encode('utf-8'))
+                            client_socket.sendall(f"[The group '{group_name}' does not exist!]".encode('utf-8'))
                             continue
                         
                         # Notify all members about the group deletion
                         for client in group_socketList[group_name]:
-                            client.sendall(f"[The group {group_name} has been deleted!]".encode('utf-8'))
+                            client.sendall(f"[The group '{group_name}' has been deleted!]".encode('utf-8'))
 
                         # Remove all members from the group and delete the group
                         for member in group_socketList[group_name]:
@@ -223,7 +223,7 @@ def handle_client(client_socket, clients, client_username, group_socketList, use
                         if not group_socketList[group_name]:
                             del group_socketList[group_name]
 
-                        client_socket.sendall(f"[You have successfully left the group {group_name}]".encode('utf-8'))
+                        client_socket.sendall(f"[You have successfully left the group '{group_name}']".encode('utf-8'))
 
                         # If the group becomes empty, delete it (OPTIONAL)
                         #if not group_socketList[group_name]:
