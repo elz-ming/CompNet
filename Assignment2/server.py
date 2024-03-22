@@ -113,6 +113,10 @@ def handle_client(client_socket, clients, client_username, group_socketList, use
                             client_socket.sendall("Error: @group set requires at least one member after the group name.".encode('utf-8'))
                             continue
 
+                        if group_name in group_socketList:
+                            client_socket.sendall(f"[Error: Group '{group_name}' already exist.]".encode('utf-8'))
+                            continue
+
                         # Splitting the members string by spaces to handle member names
                         group_members = group_members_str.split(", ")
 
