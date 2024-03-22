@@ -167,7 +167,7 @@ def handle_client(client_socket, clients, client_username, group_socketList, use
                         else:
                             for member_socket in group_socketList[group_name]:
                                 if member_socket != client_socket:  # Don't echo to sender
-                                    member_socket.sendall(f"[{group_name}]: {username} says: {group_message}".encode('utf-8'))
+                                    member_socket.sendall(f"[{group_name}-{username}: ]{group_message}".encode('utf-8'))
 
                     # 4.3 - DELETE GROUP
                     elif second_command == "delete":
