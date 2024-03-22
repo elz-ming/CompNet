@@ -56,7 +56,7 @@ def handle_client(client_socket, clients, client_username, group_socketList, use
         try:
             # Receive message from client
             message = client_socket.recv(1024).decode('utf-8')
-            print(message) #for debugging purposes
+            #print(message) #for debugging purposes
             username = client_username[client_socket]
             
             # If client is sending a command
